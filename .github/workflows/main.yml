@@ -44,11 +44,11 @@ jobs:
                   .map(label => label.name)
                   .filter(name => {
                     switch (name) {
-                      case 'deploying';
+                      case 'deploying':
                         return state !== 'pending'
-                      case 'deployed';
+                      case 'deployed':
                         return state !== 'success'
-                      case 'deploy-failed';
+                      case 'deploy-failed':
                         return state !== 'error' && state !== 'failure'
                       default:
                         return true
