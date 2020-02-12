@@ -17,6 +17,8 @@ jobs:
             const repo = context.payload.repository.name
 
             for (const branch of context.payload.branches) {
+              console.log('head:', `${owner}/${branch.name}`)
+              
               const prs = await github.paginate(github.pulls.list.endpoint.merge({
                 owner,
                 repo,
@@ -25,6 +27,8 @@ jobs:
               }))
 
               for (const pr of prs) {
+                console.log(pr)
+
                 console.log('labels:', pr.labels)
                 const newLabels = pr.labels
                   .map(label => label.name)
