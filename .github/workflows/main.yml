@@ -3,6 +3,42 @@ on:
   status
 
 jobs:
+  deploying:
+    if: github.event.context == 'netlify/deploy-preview' && github.event.state == 'success'
+    name: Add Deploying Label
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@0.4.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            console.log(context)
+
+            const owner = context.repository.owner.login
+            const repo = context.repository.name
+
+            console.log(owner, repo)
+
+            for (cont branch of context.branches) {
+              const prs = await github.paginate(github.pulls.list({
+                owner,
+                repo,
+                state: 'open',
+                head: `${owner}/${branch.name}`,
+              }))
+
+              for (const pr of prs) {
+                console.log(pr)
+
+                github.issues.addLabels({
+                  issue_number: pr.number,
+                  owner,
+                  repo,
+                  labels: ['deployed']
+                })
+              }
+            }
+
   debug:
     name: Debug
     runs-on: ubuntu-latest
