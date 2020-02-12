@@ -4,7 +4,7 @@ on:
 
 jobs:
   deploying:
-    if: github.event.context == 'netlify/deploy-preview' && github.event.state == 'success'
+    if: github.event.context == 'deploy/netlify' && github.event.state == 'success'
     name: Add Deploying Label
     runs-on: ubuntu-latest
     steps:
