@@ -17,13 +17,13 @@ jobs:
             const repo = context.payload.repository.name
 
             for (const branch of context.payload.branches) {
-              console.log('head:', `${owner}/${branch.name}`)
-              
+              console.log('head:', `${owner}:${branch.name}`)
+
               const prs = await github.paginate(github.pulls.list.endpoint.merge({
                 owner,
                 repo,
                 state: 'open',
-                head: `${owner}/${branch.name}`,
+                head: `${owner}:${branch.name}`,
               }))
 
               for (const pr of prs) {
