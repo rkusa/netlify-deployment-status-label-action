@@ -14,12 +14,12 @@ jobs:
           script: |
             console.log(context)
 
-            const owner = context.repository.owner.login
-            const repo = context.repository.name
+            const owner = context.payload.repository.owner.login
+            const repo = context.payload.repository.name
 
             console.log(owner, repo)
 
-            for (const branch of context.branches) {
+            for (const branch of context.payload.branches) {
               const prs = await github.paginate(github.pulls.list({
                 owner,
                 repo,
