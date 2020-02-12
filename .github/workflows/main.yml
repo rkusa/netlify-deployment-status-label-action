@@ -1,9 +1,6 @@
 name: Netlify Deploy Status Label
 on:
-  check_suite:
-    types: [requested, rerequested, completed]
-  check_run:
-    types: [created, rerequested, completed, requested_action]
+  status
 
 jobs:
   debug:
