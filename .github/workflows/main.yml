@@ -20,7 +20,7 @@ jobs:
             console.log(owner, repo)
 
             for (const branch of context.payload.branches) {
-              const prs = await github.paginate(github.pulls.list({
+              const prs = await github.paginate(github.pulls.list.endpoint.merge({
                 owner,
                 repo,
                 state: 'open',
