@@ -19,7 +19,7 @@ jobs:
 
             console.log(owner, repo)
 
-            for (cont branch of context.branches) {
+            for (const branch of context.branches) {
               const prs = await github.paginate(github.pulls.list({
                 owner,
                 repo,
