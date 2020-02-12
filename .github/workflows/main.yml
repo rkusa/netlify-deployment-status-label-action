@@ -31,15 +31,7 @@ jobs:
               for (const pr of prs) {
                 console.log(pr)
 
-                const labels = Array.from(
-                  await github.paginate(github.issues.listLabelsOnIssue.endpoint.merge({
-                    owner,
-                    repo,
-                    issue_number: pr.number,
-                  }))
-                )
-
-                console.log('labels:', labels)
+                console.log('labels:', pr.labels)
                 const newLabels = labels
                   .map(label => label.name)
                   .filter(name => {
