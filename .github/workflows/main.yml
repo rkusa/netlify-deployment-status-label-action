@@ -4,7 +4,7 @@ on:
 
 jobs:
   deploying:
-    if: github.event.context == 'deploy/netlify' && startsWith(github.event.target_url, 'https://app.netlify.com/sites/nervous-dubinsky-25f352')
+    if: github.event.context == 'deploy/netlify' && contains(github.event.target_url, 'nervous-dubinsky-25f352')
     name: Add Deploying Label
     runs-on: ubuntu-latest
     steps:
@@ -12,13 +12,9 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            console.log(context)
-
             const state = context.payload.state // success, pending, error, failure
             const owner = context.payload.repository.owner.login
             const repo = context.payload.repository.name
-
-            console.log(owner, repo)
 
             for (const branch of context.payload.branches) {
               const prs = await github.paginate(github.pulls.list.endpoint.merge({
@@ -29,23 +25,25 @@ jobs:
               }))
 
               for (const pr of prs) {
-                console.log(pr)
-
                 console.log('labels:', pr.labels)
                 const newLabels = pr.labels
                   .map(label => label.name)
-                  .filter(name => {
-                    switch (name) {
-                      case 'deploying':
-                        return state !== 'pending'
-                      case 'deployed':
-                        return state !== 'success'
-                      case 'deploy-failed':
-                        return state !== 'error' && state !== 'failure'
-                      default:
-                        return true
-                    }
-                  })
+                  .filter(name => (!['deploying', 'deployed', 'deploy-failed'].includes(name)))
+
+                switch (state) {
+                  case 'success':
+                    newLabels.push('deployed')
+                    break
+                    
+                  case 'pending':
+                    newLabels.push('deploying')
+                    break
+                    
+                  case 'error':
+                  case 'failure':
+                    newLabels.push('deploy-failed')
+                    break
+                }
 
                 console.log('newLabels:', newLabels)
 
