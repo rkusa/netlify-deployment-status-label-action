@@ -12,30 +12,28 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            console.log(context)
-            
             const state = context.payload.state // success, pending, error, failure
             const owner = context.payload.repository.owner.login
             const repo = context.payload.repository.name
-
             for (const branch of context.payload.branches) {
               console.log('head:', `${owner}:${branch.name}`)
-
               const prs = await github.paginate(github.pulls.list.endpoint.merge({
                 owner,
                 repo,
                 state: 'open',
                 head: `${owner}:${branch.name}`,
               }))
-
               for (const pr of prs) {
+                if (context.payload.commit.sha === pr.head.sha) {
+                  // don't update labels if the status is reported for a commit that is not the current head of this PR
+                  continue;
+                }
+                
                 console.log(pr)
-
                 console.log('labels:', pr.labels)
                 const newLabels = pr.labels
                   .map(label => label.name)
                   .filter(name => (!['deploying', 'deployed', 'deploy-failed'].includes(name)))
-
                 switch (state) {
                   case 'success':
                     newLabels.push('deployed')
@@ -50,9 +48,7 @@ jobs:
                     newLabels.push('deploy-failed')
                     break
                 }
-
                 console.log('newLabels:', newLabels)
-
                 github.issues.replaceLabels({
                   owner,
                   repo,
@@ -61,7 +57,6 @@ jobs:
                 })
               }
             }
-
   debug:
     name: Debug
     runs-on: ubuntu-latest
