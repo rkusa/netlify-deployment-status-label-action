@@ -24,8 +24,9 @@ jobs:
                 head: `${owner}:${branch.name}`,
               }))
               for (const pr of prs) {
-                if (context.payload.commit.sha === pr.head.sha) {
+                if (context.payload.commit.sha !== pr.head.sha) {
                   // don't update labels if the status is reported for a commit that is not the current head of this PR
+                  console.warn('ignoring out of date pull request')
                   continue;
                 }
                 
